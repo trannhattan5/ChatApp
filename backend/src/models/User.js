@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
-import { use } from "react";
-
+ 
 // Định nghĩa schema cho User
 const userSchema = new mongoose.Schema({
     username: {

@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import {
     connectDB
 } from './libs/db.js';
+import authRoute from './routers/authRouter.js'
 
 // Load các biến môi trường từ file .env
 dotenv.config();
@@ -12,6 +13,11 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware để phân tích JSON body
 app.use(express.json());
+
+//public route 
+app.use('/api/auth', authRoute)
+
+//private route
 
 // Kết nối đến cơ sở dữ liệu MongoDB
 connectDB().then(() => {
