@@ -2,8 +2,8 @@ import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
 
 import { Label } from "@radix-ui/react-label"
-import { Input } from "./ui/input"
-import { Button } from "./ui/button"
+import { Input } from "../ui/input"
+import { Button } from "../ui/button"
 import {useForm} from 'react-hook-form'
 import {zodResolver} from '@hookform/resolvers/zod' // giúp kết nối reacthookform 
 // zod kiểm tra dữ liệu; reacthookform lo sự kiện trạng thái của form
