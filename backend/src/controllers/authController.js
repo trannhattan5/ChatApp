@@ -69,7 +69,7 @@ export const signIn = async (req, res) => {
                 message: "Thiếu username hoặc password"
             })
         }
-        
+
 
         //lấy hashedpassword trong db để so sánh password user nhập
         const user = await User.findOne({
@@ -83,8 +83,8 @@ export const signIn = async (req, res) => {
         }
         //kiểm trả password
         const passwordCorrect = await bcrypt.compare(password, user.hashedPassword)
-                console.log("Password"+ password);
-                console.log("Password"+ user.hashedPassword);
+        console.log("Password" + password);
+        console.log("Password" + user.hashedPassword);
 
         if (!passwordCorrect) {
             return res.status(401).json({
@@ -106,25 +106,54 @@ export const signIn = async (req, res) => {
 
         //tạo session mới để lưu refreshtoken 
         await Session.create({
-            userId:user._id,
-            refreshToken, 
-            expiresAt:new Date(Date.now() + REFRESH_TOKEN_TTL)
+            userId: user._id,
+            refreshToken,
+            expiresAt: new Date(Date.now() + REFRESH_TOKEN_TTL)
         })
 
         //trả refresh token trong cookie
-        res.cookie('refreshToken',refreshToken,{
-            httpOnly:true,//ko bị truy cập bới js
-            secure:true,//chỉ gửi qua https
-            sameSite:'none',//backend ,frondend deploy riêng
-            maxAge:REFRESH_TOKEN_TTL
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true, //ko bị truy cập bới js
+            secure: true, //chỉ gửi qua https
+            sameSite: 'none', //backend ,frondend deploy riêng
+            maxAge: REFRESH_TOKEN_TTL
 
         })
 
         //trả access token về trong res
-        return res.status(200).json({message:`Usser ${user.displayName} đã logged in `}, accessToken)
+        return res.status(200).json({
+            message: `Usser ${user.displayName} đã logged in `,
+            accessToken
+        })
 
     } catch (error) {
         console.error('Lỗi khi gọi signIn', error);
+        return res.sendStatus(500).json({
+            message: "Lỗi hệ thống"
+        })
+    }
+}
+
+export const signOut = async (req, res) => {
+    try {
+        // lấy refresh token từ cookie
+        const token = req.cookies?.refreshToken;
+
+        //xóa refresh token trong session 
+        if (token) {
+            await Session.deleteOne({
+                refreshToken: token
+            })
+        }
+ 
+        //xóa cookie
+        res.clearCookie('refreshToken');
+
+        return res.sendStatus(204)
+
+
+    } catch (error) {
+        console.error('Lỗi khi gọi signOut', error);
         return res.sendStatus(500).json({
             message: "Lỗi hệ thống"
         })

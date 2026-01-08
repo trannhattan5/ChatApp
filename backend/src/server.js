@@ -4,6 +4,7 @@ import {
     connectDB
 } from './libs/db.js';
 import authRoute from './routers/authRouter.js'
+import cookieParser from 'cookie-parser';
 
 // Load các biến môi trường từ file .env
 dotenv.config();
@@ -13,6 +14,8 @@ const PORT = process.env.PORT || 5001;
 
 // Middleware để phân tích JSON body
 app.use(express.json());
+app.use(cookieParser())
+
 
 //public route 
 app.use('/api/auth', authRoute)
