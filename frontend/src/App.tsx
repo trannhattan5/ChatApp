@@ -13,7 +13,7 @@ function App() {
         <Routes>
           {/* public route */}
           <Route path="signin" element={<SignInPage />} />
-          <Route path="signin" element={<SignUpPage />} />
+          <Route path="signup" element={<SignUpPage />} />
 
 
           {/* protected route */}
