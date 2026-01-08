@@ -9,6 +9,8 @@ import {zodResolver} from '@hookform/resolvers/zod' // giúp kết nối reactho
 // zod kiểm tra dữ liệu; reacthookform lo sự kiện trạng thái của form
 
 import { z } from 'zod'
+import { useAuthStore } from "@/store/useAuthStore"
+import { useNavigate } from "react-router"
 const signUpSchema = z.object({
   firstname: z.string().min(1, 'Tên bắt buộc phải có'),
   lastname: z.string().min(1, 'Họ bắt buộc phải có'),
@@ -22,13 +24,18 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const {signUp} = useAuthStore();
+  const navigate = useNavigate();
 
   //theo dõi giá trị ô input - chạy khi người dùng bấm đăng ký -lấy (error nếu input ko hợp lệ-khi nào form trong quá trình gửi dữ liệu)
   const {register,handleSubmit,formState:{errors,isSubmitting}}=useForm<SignUpFormValues>({
     resolver:zodResolver(signUpSchema)
   });
   const onSubmit = async(data :SignUpFormValues)=>{
+    const {firstname,lastname,username,email,password} = data
     //gọi api backend để sign
+    await signUp(username,password,email,firstname,lastname)
+    navigate("/signin")
   }
 
   return (
