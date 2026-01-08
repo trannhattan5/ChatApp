@@ -4,7 +4,9 @@ import {
     connectDB
 } from './libs/db.js';
 import authRoute from './routers/authRouter.js'
+import userRoute from './routers/userRouter.js'
 import cookieParser from 'cookie-parser';
+import { protectedRoute } from './middlewares/authMiddleware.js';
 
 // Load các biến môi trường từ file .env
 dotenv.config();
@@ -21,6 +23,8 @@ app.use(cookieParser())
 app.use('/api/auth', authRoute)
 
 //private route
+app.use(protectedRoute)
+app.use('/api/users',userRoute)
 
 // Kết nối đến cơ sở dữ liệu MongoDB
 connectDB().then(() => {
