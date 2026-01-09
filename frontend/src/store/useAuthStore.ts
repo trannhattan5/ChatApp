@@ -8,6 +8,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     user: null,
     loading: false,
 
+    setAccessToken:(accessToken:string)=>{
+        set({accessToken})
+    },
+
+
     clearState : () => set({ accessToken: null, user: null, loading: false}),
 
     signUp: async (username, password, email, firstName, lastName) => {
@@ -32,7 +37,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             set({loading:true})
             //gọi api
             const {accessToken} = await authService.signIn(username,password);
-            set({accessToken})
+             get().setAccessToken(accessToken);
 
             await get().fetchMe();//lấy thông tin user sau khi đăng nhập thành công
 
@@ -77,10 +82,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     refersh: async () =>{
         try {
             set({loading:true})
-            const {user, fetchMe} = get();
+            const {user, fetchMe, setAccessToken} = get();
             const accessToken = await authService.refersh();
 
-            set({accessToken})
+             setAccessToken(accessToken);
+
 
             // nếu có lỗi thì gọi lại fecthme để lấy lại user
             if(!user){
@@ -95,6 +101,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         finally{
             set({loading:false}) // api đã xử lý xong
         }
-    }
+    },
 
 }))
