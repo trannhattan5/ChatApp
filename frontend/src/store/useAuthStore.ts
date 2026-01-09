@@ -23,6 +23,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         finally{
             set({loading:false})//api đã xử lý xong
         }
-    }
+    },
+
+    signIn: async (username,password) => {
+        try {
+            set({loading:true})
+            //gọi api
+            const {accessToken} = await authService.signIn(username,password);
+            set({accessToken})
+            toast.success('Đăng nhập thành công!')
+        } catch (error) {
+            console.error(error);
+            toast.error('Đăng nhập không thành công')
+        }
+        finally{
+            set({loading:false})//api đã xử lý xong
+        }
+    },
 
 }))
