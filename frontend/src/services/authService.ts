@@ -10,5 +10,9 @@ export const authService = {
     signIn: async (username: string, password: string) => {
         const res = await api.post("/auth/signin", { username, password }, { withCredentials: true })
         return res.data;// accessToken 
+    },
+    signOut: async () => {
+        const res = await api.post("/auth/signout", {}, { withCredentials: true })
+        return res.data;
     }
 }
