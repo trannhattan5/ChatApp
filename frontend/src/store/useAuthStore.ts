@@ -73,6 +73,28 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         finally{
             set({loading:false})//api đã xử lý xong
         }
+    },
+    refersh: async () =>{
+        try {
+            set({loading:true})
+            const {user, fetchMe} = get();
+            const accessToken = await authService.refersh();
+
+            set({accessToken})
+
+            // nếu có lỗi thì gọi lại fecthme để lấy lại user
+            if(!user){
+                await fetchMe();
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Phiên đăng nhập đã hết hạn , vui lòng đăng nhậ lại!')
+            get().clearState();
+            
+        }
+        finally{
+            set({loading:false}) // api đã xử lý xong
+        }
     }
 
 }))

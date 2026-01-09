@@ -159,3 +159,42 @@ export const signOut = async (req, res) => {
         })
     }
 }
+
+export const refreshToken = async (req, res) =>{
+    try {
+        // Lấy refresh token từ cookie  
+        const token = req.cookies?.refreshToken;
+
+        if (!token) {
+            return res.status(401).json({message: "Không tìm thấy refresh token"})
+        }
+
+        //kiểm tra refresh token trong session
+        const session = await Session.findOne({
+            refreshToken: token
+        })
+
+        if (!session) {
+            return res.status(403).json({message: "Refresh token không hợp lệ hoặc hết hạn"})
+        }
+
+        //kiểm tra thời gian hết hạn
+        if (session.expiresAt < new Date()) {
+            return res.status(403).json({message: "Refresh token đã hết hạn"})
+        }
+
+        //tạo access token mới
+        const accessToken = jwt.sign({
+            userId: session.userId
+        }, process.env.ACCESS_TOKEN_SECRET, {
+            expiresIn: ACCESS_TOKEN_TTL
+        })
+
+
+        return res.status(200).json({accessToken})
+    } catch (error) {
+        console.error("Lỗi khi gọi refresh token ", error);
+        return res.status(500).json({message: "Lỗi hệ thống"})
+        
+    }
+}

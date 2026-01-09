@@ -18,5 +18,9 @@ export const authService = {
     fetchMe : async () => {
         const res = await api.get("/users/me", { withCredentials: true }) // withCredentials : gửi cookie lên server
         return res.data.user;// trả về user
+    },
+    refersh: async () =>{
+        const res = await api.post("/auth/refresh", {withCredentials:true})
+        return res.data.accessToken; // trả về accessToken mới
     }
 }
