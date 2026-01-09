@@ -33,6 +33,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
             //gọi api
             const {accessToken} = await authService.signIn(username,password);
             set({accessToken})
+
+            await get().fetchMe();//lấy thông tin user sau khi đăng nhập thành công
+
             toast.success('Đăng nhập thành công!')
         } catch (error) {
             console.error(error);
@@ -52,6 +55,20 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } catch (error) {
             console.error(error);
             toast.error('Đăng xuất không thành công')
+        }
+        finally{
+            set({loading:false})//api đã xử lý xong
+        }
+    },
+    fetchMe: async () => {
+        try {
+            set({loading:true})
+            const user = await authService.fetchMe();
+            set({user})
+        } catch (error) {
+            console.error(error);
+            set({user:null,accessToken:null})
+            toast.error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại')
         }
         finally{
             set({loading:false})//api đã xử lý xong
