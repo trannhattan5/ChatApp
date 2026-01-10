@@ -160,8 +160,48 @@ export const declineFriendRequest = async (req, res) => {
     }
 
 }
-export const getAllFriends = (req, res) => {
+export const getAllFriends = async (req, res) => {
     try {
+        const userId = req.user._id;
+        const friendships = await Friend.find({
+            $or: [{
+                    userA: userId
+                },
+                {
+                    userB: userId
+                }
+            ]
+        }).populate([
+            {
+                path: 'userA',
+                select: '_id displayName avatarUrl'
+            },
+            {
+                path: 'userB',
+                select: '_id displayName avatarUrl'
+            }
+        ]).lean();
+
+        if (!friendships.length) {
+            return res.status(200).json({
+                message: "Lấy danh sách bạn bè thành công",
+                friends: []
+            });
+        }
+
+        
+        const friends = friendships.map(friendship => {
+            if (friendship.userA._id.toString() === userId.toString()) {
+                return friendship.userB;
+            } else {
+                return friendship.userA;
+            }
+        });
+
+        return res.status(200).json({
+            message: "Lấy danh sách bạn bè thành công",
+            friends
+        });
 
     } catch (error) {
         console.error("Lỗi khi lấy danh sách bạn", error);
