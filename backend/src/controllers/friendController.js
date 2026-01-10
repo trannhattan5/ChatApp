@@ -83,8 +83,40 @@ export const sendFriendRequest = async (req, res) => {
     }
 
 }
-export const acceptFriendRequest = (req, res) => {
+export const acceptFriendRequest = async (req, res) => {
     try {
+        const { requestId } = req.params;
+        const userId = req.user._id;
+
+        const request = await FriendRequest.findById(requestId);
+
+        if (!request) {
+            return res.status(404).json({
+                message: "Yêu cầu kết bạn không tồn tại"
+            });
+        }
+        if (request.to.toString() !== userId.toString()) {
+            return res.status(403).json({
+                message: "Không có quyền chấp nhận yêu cầu này"
+            });
+        }
+        const friend = await Friend.create({
+            userA: request.form,
+            userB: request.to
+        });
+
+        await FriendRequest.findByIdAndDelete(requestId);
+
+        const from = await User.findById(request.from).select('_id displayName avatarUrl').lean();
+
+        return res.status(200).json({
+            message: "Đã chấp nhận yêu cầu kết bạn",
+            newFiend: {
+                _id: from?._id,
+                displayName: from?.displayName,
+                avatarUrl: from?.avatarUrl
+            }
+        });
 
     } catch (error) {
         console.error("Lỗi khi chấp nhận yêu cầu kết bạn", error);
