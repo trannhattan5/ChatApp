@@ -5,6 +5,7 @@ import {
 } from './libs/db.js';
 import authRoute from './routers/authRouter.js'
 import userRoute from './routers/userRouter.js'
+import friendRoute from './routers/friendRoute.js'
 import cookieParser from 'cookie-parser';
 import { protectedRoute } from './middlewares/authMiddleware.js';
 import cors from 'cors'
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoute)
 //private route
 app.use(protectedRoute)
 app.use('/api/users',userRoute)
+app.use('/api/friends', friendRoute);
 
 // Kết nối đến cơ sở dữ liệu MongoDB
 connectDB().then(() => {
