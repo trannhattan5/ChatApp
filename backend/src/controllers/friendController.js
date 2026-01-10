@@ -101,8 +101,8 @@ export const acceptFriendRequest = async (req, res) => {
             });
         }
         const friend = await Friend.create({
-            userA: request.form,
-            userB: request.to
+            userA: request.from,
+            userB: request.to,
         });
 
         await FriendRequest.findByIdAndDelete(requestId);
@@ -111,7 +111,7 @@ export const acceptFriendRequest = async (req, res) => {
 
         return res.status(200).json({
             message: "Đã chấp nhận yêu cầu kết bạn",
-            newFiend: {
+            newFriend: {
                 _id: from?._id,
                 displayName: from?.displayName,
                 avatarUrl: from?.avatarUrl
@@ -127,8 +127,29 @@ export const acceptFriendRequest = async (req, res) => {
     }
 
 }
-export const declineFriendRequest = (req, res) => {
+export const declineFriendRequest = async (req, res) => {
     try {
+
+        const { requestId } = req.params;
+        const userId = req.user._id;
+
+        const request = await FriendRequest.findById(requestId);
+
+        if (!request) {
+            return res.status(404).json({
+                message: "Yêu cầu kết bạn không tồn tại"
+            });
+        }
+        if (request.to.toString() !== userId.toString()) {
+            return res.status(403).json({
+                message: "Không có quyền từ chối yêu cầu này"
+            });
+        }
+
+        await FriendRequest.findByIdAndDelete(requestId);
+
+        return res.sendStatus(204);
+
 
     } catch (error) {
         console.error("Lỗi khi từ chối yêu cầu kết bạn", error);
